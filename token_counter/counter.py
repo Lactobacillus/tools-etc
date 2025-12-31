@@ -95,7 +95,7 @@ def count_tokens(
 
     if not text:
 
-        length 0
+        length = 0
 
     else:
 
