@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import numpy as np
 from pathlib import Path
 from typing import List, Dict, Tuple, Set, Union, Optional, Literal, Any, Callable
 
@@ -109,6 +110,7 @@ def scan_directory(
         encoder: tiktoken.Encoding) -> dict[str, int]:
 
     stats = {
+        'tokens': list(),
         'total_tokens': 0,
         'total_files': 0,
         'pdf_files': 0,
@@ -138,6 +140,7 @@ def scan_directory(
                 text = extract_text_from_pdf(filepath)
                 tokens = count_tokens(text, encoder)
 
+                stats['tokens'].append(tokens)
                 stats['total_tokens'] = stats['total_tokens'] + tokens
                 stats['pdf_files'] = stats['pdf_files'] + 1
                 stats['total_files'] = stats['total_files'] + 1
@@ -156,6 +159,7 @@ def scan_directory(
             text = read_text_file(filepath)
             tokens = count_tokens(text, encoder)
 
+            stats['tokens'].append(tokens)
             stats['total_tokens'] = stats['total_tokens'] + tokens
             stats['text_files'] = stats['text_files'] + 1
             stats['total_files'] = stats['total_files'] + 1
@@ -192,6 +196,9 @@ def main(
     print('[info] # of text files: {:,}'.format(stats['text_files']))
     print('[info] # of skipped files: {:,}'.format(stats['skipped_files']))
     print('[info] # of total tokens: {:,}'.format(stats['total_tokens']))
+    print('[info] # of total tokens: {:,}'.format(np.sum(stats['tokens'])))
+    print('[info] Avg. tokens per documents: {:,}'.format(np.mean(stats['tokens'])))
+    print('[info] Med. tokens per documents: {:,}'.format(np.median(stats['tokens'])))
 
 
 if __name__ == '__main__':
